@@ -17,6 +17,7 @@
 @property (nonatomic, strong) NSMutableDictionary *colors;
 @property (nonatomic, strong) NSMutableArray *counts; // of NSNumber
 @property (nonatomic, getter = isTransitioning) BOOL transitioning;
+@property (nonatomic) BOOL shouldSelectSegment;
 @end
 
 @implementation DZNSegmentedControl
@@ -213,7 +214,7 @@
     return self.items[segment];
 }
 
-- (NSNumber *)countForSegmentAtIndex:(NSUInteger)segment
+- (id)countForSegmentAtIndex:(NSUInteger)segment
 {
     return segment < self.counts.count ? self.counts[segment] : @(0);
 }
@@ -341,7 +342,7 @@
     if (self.items) {
         [self removeAllSegments];
     }
-
+    
     if (items) {
         _items = [NSArray arrayWithArray:items];
         _counts = [NSMutableArray arrayWithCapacity:items.count];
@@ -402,7 +403,21 @@
     NSAssert(segment >= 0, @"Cannot assign a title to a negative segment.");
     
     self.counts[segment] = count;
-        
+    
+    [self configureSegments];
+}
+
+- (void)setCountString:(NSString *)count forSegmentAtIndex:(NSUInteger)segment
+{
+    if (!count || !self.items) {
+        return;
+    }
+    
+    NSAssert(segment < self.numberOfSegments, @"Cannot assign a count to non-existing segment.");
+    NSAssert(segment >= 0, @"Cannot assign a title to a negative segment.");
+    
+    self.counts[segment] = count;
+    
     [self configureSegments];
 }
 
@@ -463,7 +478,7 @@
             if (components.count < 2) {
                 return;
             }
-
+            
             NSString *count = [components objectAtIndex:self.inverseTitles ? 1 : 0];
             NSString *title = [components objectAtIndex:self.inverseTitles ? 0 : 1];
             
@@ -476,7 +491,7 @@
                 
                 UIColor *topColor = self.inverseTitles ? [color colorWithAlphaComponent:0.5] : color;
                 UIColor *bottomColor = self.inverseTitles ? color : [color colorWithAlphaComponent:0.5];
-
+                
                 NSUInteger topLength = self.inverseTitles ? title.length : count.length;
                 NSUInteger bottomLength = self.inverseTitles ? count.length : title.length;
                 
@@ -520,7 +535,7 @@
     
     CGFloat damping = !self.bouncySelectionIndicator ? : 0.65;
     CGFloat velocity = !self.bouncySelectionIndicator ? : 0.5;
-
+    
     [UIView animateWithDuration:duration
                           delay:0.0
          usingSpringWithDamping:damping
@@ -637,6 +652,7 @@
     [button addTarget:self action:@selector(willSelectedButton:) forControlEvents:UIControlEventTouchDown];
     [button addTarget:self action:@selector(didSelectButton:) forControlEvents:UIControlEventTouchDragOutside|UIControlEventTouchDragInside|UIControlEventTouchDragEnter|UIControlEventTouchDragExit|UIControlEventTouchCancel|UIControlEventTouchUpInside|UIControlEventTouchUpOutside];
     
+    
     button.backgroundColor = nil;
     button.opaque = YES;
     button.clipsToBounds = YES;
@@ -644,7 +660,7 @@
     button.adjustsImageWhenDisabled = NO;
     button.exclusiveTouch = YES;
     button.tag = segment;
-
+    
     [self addSubview:button];
 }
 
@@ -666,19 +682,24 @@
     NSMutableString *title = [NSMutableString stringWithFormat:@"%@", self.items[segment]];
     
     if (self.showsCount) {
-        NSNumber *count = [self countForSegmentAtIndex:segment];
-        
         NSString *breakString = @"\n";
         NSString *countString;
         
-        if (self.numberFormatter) {
-            countString = [self.numberFormatter stringFromNumber:count];
-        }
-        else if (!self.numberFormatter && _showsGroupingSeparators) {
-            countString = [[[self class] defaultFormatter] stringFromNumber:count];
-        }
-        else {
-            countString = [NSString stringWithFormat:@"%@", count];
+        id countObject = [self countForSegmentAtIndex:segment];
+        if ([countObject isKindOfClass:[NSNumber class]]) {
+            NSNumber *count = (NSNumber*)countObject;
+            
+            if (self.numberFormatter) {
+                countString = [self.numberFormatter stringFromNumber:count];
+            }
+            else if (!self.numberFormatter && _showsGroupingSeparators) {
+                countString = [[[self class] defaultFormatter] stringFromNumber:count];
+            }
+            else {
+                countString = [NSString stringWithFormat:@"%@", count];
+            }
+        } else if([countObject isKindOfClass:[NSString class]]) {
+            countString = (NSString*)countObject;
         }
         
         NSString *resultString = self.inverseTitles ? [breakString stringByAppendingString:countString] : [countString stringByAppendingString:breakString];
@@ -694,7 +715,13 @@
 {
     UIButton *button = (UIButton *)sender;
     
-    if (!self.isTransitioning) {
+    BOOL shouldChange = YES;
+    if (self.delegate && [self.delegate respondsToSelector:@selector(segmentedControl:shouldChangeToSegmentAtIndex:)]) {
+        shouldChange = [self.delegate segmentedControl:self shouldChangeToSegmentAtIndex:button.tag];
+    }
+    self.shouldSelectSegment = shouldChange;
+    
+    if (!self.isTransitioning && shouldChange) {
         self.selectedSegmentIndex = button.tag;
     }
 }
@@ -703,8 +730,12 @@
 {
     UIButton *button = (UIButton *)sender;
     
-    button.highlighted = NO;
-    button.selected = YES;
+    if (self.shouldSelectSegment) {
+        button.highlighted = NO;
+        button.selected = YES;
+    }
+    
+    self.shouldSelectSegment = YES;
 }
 
 - (void)disableAllButtonsSelection
@@ -740,14 +771,14 @@
 + (NSNumberFormatter *)defaultFormatter
 {
     static NSNumberFormatter *defaultFormatter;
-
+    
     static dispatch_once_t oncePredicate;
     dispatch_once(&oncePredicate, ^{
         defaultFormatter = [[NSNumberFormatter alloc] init];
         defaultFormatter.numberStyle = NSNumberFormatterDecimalStyle;
         [defaultFormatter setGroupingSeparator:[[NSLocale currentLocale] objectForKey:NSLocaleGroupingSeparator]];
     });
-
+    
     return defaultFormatter;
 }
 

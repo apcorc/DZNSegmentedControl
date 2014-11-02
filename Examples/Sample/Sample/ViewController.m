@@ -175,6 +175,16 @@
     [self.tableView reloadData];
 }
 
+#pragma mark - DZNSegmentedControlDelegate Methods
+
+- (BOOL)segmentedControl:(DZNSegmentedControl *)control shouldChangeToSegmentAtIndex:(NSUInteger)index
+{
+    if (index == 2) {
+        NSLog(@"Do something here");
+        return NO;
+    }
+    return YES;
+}
 
 #pragma mark - UIBarPositioningDelegate Methods
 

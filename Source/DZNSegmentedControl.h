@@ -91,6 +91,7 @@
  @param segment An index number identifying a segment in the control. It must be a number between 0 and the number of segments (numberOfSegments) minus 1; values exceeding this upper range are pinned to it.
  */
 - (void)setCount:(NSNumber *)count forSegmentAtIndex:(NSUInteger)segment;
+- (void)setCountString:(NSString *)count forSegmentAtIndex:(NSUInteger)segment;
 
 /**
  Enables the specified segment.
@@ -127,4 +128,8 @@
  The DZNSegmentedControlDelegate protocol defines the interface that DZNSegmentedControl delegate objects implement to manage the segmented control behavior. This protocol declares no methods of its own but conforms to the UIBarPositioningDelegate protocol to support the positioning of a segmented control when it is moved to a window.
  */
 @protocol DZNSegmentedControlDelegate <UIBarPositioningDelegate>
+
+@optional
+- (BOOL)segmentedControl:(DZNSegmentedControl*)control shouldChangeToSegmentAtIndex:(NSUInteger)index;
+
 @end
