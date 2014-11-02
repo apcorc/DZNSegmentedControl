@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		38610A391A06D1EA00DF2161 /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 38610A381A06D1EA00DF2161 /* MainInterface.storyboard */; };
 		4FAD79331934546A009808D5 /* DZNSegmentedControl.m in Sources */ = {isa = PBXBuildFile; fileRef = 4FAD79321934546A009808D5 /* DZNSegmentedControl.m */; };
 		4FFE32C718C56B5100C3A85F /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4FFE32C618C56B5100C3A85F /* Foundation.framework */; };
 		4FFE32C918C56B5100C3A85F /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4FFE32C818C56B5100C3A85F /* CoreGraphics.framework */; };
@@ -19,6 +20,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		38610A381A06D1EA00DF2161 /* MainInterface.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = MainInterface.storyboard; sourceTree = "<group>"; };
 		4FAD79311934546A009808D5 /* DZNSegmentedControl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DZNSegmentedControl.h; path = ../../Source/DZNSegmentedControl.h; sourceTree = "<group>"; };
 		4FAD79321934546A009808D5 /* DZNSegmentedControl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DZNSegmentedControl.m; path = ../../Source/DZNSegmentedControl.m; sourceTree = "<group>"; };
 		4FFE32C318C56B5100C3A85F /* Sample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Sample.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -98,6 +100,7 @@
 				4FFE32F918C59A9E00C3A85F /* ViewController.m */,
 				4FFE32D818C56B5100C3A85F /* Images.xcassets */,
 				4FFE32CD18C56B5100C3A85F /* Supporting Files */,
+				38610A381A06D1EA00DF2161 /* MainInterface.storyboard */,
 			);
 			path = Sample;
 			sourceTree = "<group>";
@@ -166,6 +169,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4FFE32D118C56B5100C3A85F /* InfoPlist.strings in Resources */,
+				38610A391A06D1EA00DF2161 /* MainInterface.storyboard in Resources */,
 				4FFE32D918C56B5100C3A85F /* Images.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
